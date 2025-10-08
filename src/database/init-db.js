@@ -1,6 +1,7 @@
 // import MongoClient and ServerApiVersion from the mongodb library and import products from the products.js file.
 import { MongoClient, ServerApiVersion } from "mongodb";
 import { products } from "./products.js";
+import * as argon2 from "argon2";
 
 //build the uri for our connection string
 const uri = process.env.MONGO_URI || "";
@@ -24,6 +25,11 @@ const init = async () => {
     
     // initialize the Products collection
     await seedProducts(db);
+
+    // initialize the Alerts, Orders, and Users collections
+    await seedAlerts(db);
+    await seedOrders(db);
+    await seedUsers(db);
   } catch (error) {
     console.error(error.message);
   } finally {
@@ -89,9 +95,75 @@ const seedProducts = async (db) => {
 		const result = await db.collection("products").insertMany(alteredProducts);
     
     console.log(
-      `${result.insertedCount} new listing(s) created with the following id(s):`
+      `${result.insertedCount} new listing(s) created in 'products' with the following id(s):`
     );
     console.log(result.insertedIds);
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+const seedAlerts = async (db) => {
+  try {
+    // drop the collection to clear out the old records
+    if ( !(await db.collection("alerts").drop()) ) {
+      throw new Error("Collection 'alerts' could not be dropped")
+    }
+    console.log("Collection 'alerts' dropped successfully")
+    
+    // create a new collection
+    if ( !(await db.createCollection("alerts")) ) {
+      throw new Error("Collection 'alerts' could not be created")
+    }
+    console.log("Collection 'alerts' created successfully")
+  } catch (error) {
+    console.error(error.messaage)
+  }
+};
+
+const seedOrders = async (db) => {
+  try {
+    // drop the collection to clear out the old records
+    if ( !(await db.collection("orders").drop()) ) {
+			throw new Error("Collection 'orders' could not be dropped");
+		}
+    console.log("Collection 'orders' dropped successfully");
+
+    // create a new collection
+    if ( !(await db.createCollection("orders")) ) {
+			throw new Error("Collection 'orders' could not be created");
+		}
+    console.log("Collection 'orders' created successfully");
+  } catch (error) {
+    console.log('error');
+    console.error(error.message);
+  }
+};
+
+const seedUsers = async (db) => {
+  try {
+    // drop the collection to clear out the old records
+    if ( !(await db.collection("users").drop()) ) {
+			throw new Error("Collection 'users' could not be dropped");
+		}
+    console.log("Collection 'users' dropped successfully");
+
+    // create a new collection
+    if ( !(await db.createCollection("users")) ) {
+			throw new Error("Collection 'users' could not be created");
+		}
+    console.log("Collection 'users' created successfully");
+
+    // insert test user
+    const result = await db.collection("users").insertOne({
+      name: "Test User",
+      email: "user@example.com",
+      password_hash: await argon2.hash("password"),
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    });
+    
+    console.log(`1 new listing created in 'users' with the following id:`, result.insertedId);
   } catch (error) {
     console.error(error.message);
   }

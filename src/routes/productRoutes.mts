@@ -1,11 +1,11 @@
-import {Router } from "express";
-import { getAllProducts, getProductById } from "../models/productModel.mts";
-import EntityNotFoundError from "../errors/EntityNotFoundError.mts";
-import type { Request, Response } from "express";
+import { Router } from 'express';
+import { getAllProducts, getProductById } from '../models/productModel.mts';
+import EntityNotFoundError from '../errors/EntityNotFoundError.mts';
+import type { Request, Response } from 'express';
 const router: Router = Router();
 
 // GET /products/
-router.get("/", async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   console.log(req.headers, req.body);
   const products = await getAllProducts();
   if (!products?.length) {
@@ -19,7 +19,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // GET /products/:id
-router.get("/:id", async (req:Request, res:Response) => {
+router.get('/:id', async (req:Request, res:Response) => {
   
     const {id} = req.params;
     if (!id)  {

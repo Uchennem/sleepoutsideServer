@@ -1,0 +1,1725 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Alerts, Orders, and Users API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isClearance": {
+            "type": "boolean"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "tents",
+              "backpacks",
+              "sleeping-bags",
+              "hammocks"
+            ]
+          },
+          "isNew": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "reviews": {
+            "type": "object",
+            "properties": {
+              "reviewsUrl": {
+                "type": "string"
+              },
+              "reviewCount": {
+                "type": "number"
+              },
+              "averageRating": {
+                "type": "number"
+              }
+            }
+          },
+          "nameWithoutBrand": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "images": {
+            "type": "object",
+            "properties": {
+              "primarySmall": {
+                "type": "string"
+              },
+              "primaryMedium": {
+                "type": "string"
+              },
+              "primaryLarge": {
+                "type": "string"
+              },
+              "primaryExtraLarge": {
+                "type": "string"
+              },
+              "extraImages": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "src": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "sizesAvailable": {
+            "type": "object",
+            "properties": {
+              "zipper": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "size": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "colors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "colorCode": {
+                  "type": "string"
+                },
+                "colorName": {
+                  "type": "string"
+                },
+                "colorChipImageSrc": {
+                  "type": "string"
+                },
+                "colorPreviewImageSrc": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "description": {
+            "type": "string"
+          },
+          "descriptionHtmlSimple": {
+            "type": "string"
+          },
+          "suggestedRetailPrice": {
+            "type": "number"
+          },
+          "brand": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "productsUrl": {
+                "type": "string"
+              },
+              "logoSrc": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "listPrice": {
+            "type": "number"
+          },
+          "finalPrice": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "_id",
+          "id",
+          "category",
+          "url",
+          "nameWithoutBrand",
+          "name",
+          "images",
+          "colors",
+          "descriptionHtmlSimple",
+          "suggestedRetailPrice",
+          "brand",
+          "listPrice",
+          "finalPrice"
+        ]
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "type",
+          "status",
+          "createdOn",
+          "modifiedOn"
+        ]
+      },
+      "AlertUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "type",
+          "status"
+        ]
+      },
+      "AlertCreateRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "type",
+          "status"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "name":{
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum":["pending", "processing", "shipped", "delivered"],
+            "description": "The status of the order, must be one of pending, processing, shipped or delivered"
+          },
+          "cardNumber": {
+            "type": "string",
+            "description": "A 12 digit credit card number"
+          },
+          "cardExpiration": {
+            "type": "string",
+            "description": "The expiration date of the card in mm/yy format"
+          },
+          "cardCode": {
+            "type": "string",
+            "description": "The three digit security code for the card"
+          },
+          "totalPrice": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "shippingAddress": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 100,
+                "description": "The street address of the user, must not be blank and must be at least ten characters long and no more than one hundred characters long"
+              },
+              "city": {
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 50,
+                "description": "The city of the user, must not be blank and must be at least five characters long and no more than fifty characters long"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "AL",
+                  "AK",
+                  "AZ",
+                  "AR",
+                  "CA",
+                  "CO",
+                  "CT",
+                  "DE",
+                  "DC",
+                  "FL",
+                  "GA",
+                  "HI",
+                  "ID",
+                  "IL",
+                  "IN",
+                  "IA",
+                  "KS",
+                  "KY",
+                  "LA",
+                  "ME",
+                  "MD",
+                  "MA",
+                  "MI",
+                  "MN",
+                  "MS",
+                  "MO",
+                  "MT",
+                  "NE",
+                  "NV",
+                  "NH",
+                  "NJ",
+                  "NM",
+                  "NY",
+                  "NC",
+                  "ND",
+                  "OH",
+                  "OK",
+                  "OR",
+                  "PA",
+                  "RI",
+                  "SC",
+                  "SD",
+                  "TN",
+                  "TX",
+                  "UT",
+                  "VT",
+                  "VA",
+                  "WA",
+                  "WV",
+                  "WI",
+                  "WY"
+                ],
+                "description": "The state of the user, must not be blank and must be one a valid 2 character state abbreviation"
+              },
+              "zipCode": {
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 10,
+                "pattern": "^\\d{5}(-\\d{4})?$",
+                "description": "The zip code of the user, must not be blank and must be a valid zip code"
+              },
+              "country": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 30,
+                "pattern": "^\\w+$",
+                "description": "The country of the user, must not be blank and must be a valid country"
+              }
+            }},
+          "orderItems": {
+            "type": "array",
+            "items": {
+              "type": "object",
+               "$ref": "#/components/schemas/CartItem"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "status",
+          "totalPrice",
+          "createdOn",
+          "items"
+        ]
+      },
+      
+      "OrderUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "OrderUserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "email"
+        ]
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/Order"
+          }
+        },
+        "required": [
+          "order"
+        ]
+      },
+      "OrdersByUserResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number"
+          },
+          "next": {
+            "type": "string"
+          },
+          "previous": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "user": {
+                  "$ref": "#/components/schemas/OrderUserResponse"
+                }
+              },
+              "required": [
+                "order",
+                "user"
+              ]
+            }
+          }
+        },
+        "required": [
+          "orders"
+        ]
+      },
+      "CartItem": {
+        "type": "object",
+        "properties": {
+            "productId": {
+              "type": "string"
+            },
+            "productName": {
+              "type": "string"
+            },
+            "price": {
+              "type": "number"
+            },
+            "finalPrice": {
+              "type": "number"
+            },
+            "productImageSrc": {
+              "type": "string"
+            },
+            "productUrl": {
+              "type": "string"
+            },
+            "productCategory": {
+              "type": "string"
+            },
+            "productColor": {
+              "type": "object",
+              "properties": {
+                "colorCode": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "colorCode"
+              ]
+            },
+            "productSize": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "productId",
+            "productName",
+            "price",
+            "finalPrice",
+            "productImageSrc",
+            "productUrl",
+            "productCategory"
+          ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 100,
+            "description": "The password of the user, must be at least six characters long and no more than one hundred characters long"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 50,
+            "description": "The name of the user, must be at least two characters long and no more than 50 characters long"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 100,
+                "description": "The street address of the user, must not be blank and must be at least ten characters long and no more than one hundred characters long"
+              },
+              "city": {
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 50,
+                "description": "The city of the user, must not be blank and must be at least five characters long and no more than fifty characters long"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "AL",
+                  "AK",
+                  "AZ",
+                  "AR",
+                  "CA",
+                  "CO",
+                  "CT",
+                  "DE",
+                  "DC",
+                  "FL",
+                  "GA",
+                  "HI",
+                  "ID",
+                  "IL",
+                  "IN",
+                  "IA",
+                  "KS",
+                  "KY",
+                  "LA",
+                  "ME",
+                  "MD",
+                  "MA",
+                  "MI",
+                  "MN",
+                  "MS",
+                  "MO",
+                  "MT",
+                  "NE",
+                  "NV",
+                  "NH",
+                  "NJ",
+                  "NM",
+                  "NY",
+                  "NC",
+                  "ND",
+                  "OH",
+                  "OK",
+                  "OR",
+                  "PA",
+                  "RI",
+                  "SC",
+                  "SD",
+                  "TN",
+                  "TX",
+                  "UT",
+                  "VT",
+                  "VA",
+                  "WA",
+                  "WV",
+                  "WI",
+                  "WY"
+                ],
+                "description": "The state of the user, must not be blank and must be one a valid 2 character state abbreviation"
+              },
+              "zipCode": {
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 10,
+                "pattern": "^\\d{5}(-\\d{4})?$",
+                "description": "The zip code of the user, must not be blank and must be a valid zip code"
+              },
+              "country": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 30,
+                "pattern": "^\\w+$",
+                "description": "The country of the user, must not be blank and must be a valid country"
+              }
+            },
+            "required": [
+              "street",
+              "city",
+              "state",
+              "zipCode",
+              "country"
+            ]
+          },
+          "phoneNumbers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "number": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "number"
+              ]
+            }
+          },
+          "cart": {
+            "type": "array",
+            "items": {
+              "type": "object",
+               "$ref": "#/components/schemas/CartItem"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "name",
+          "createdAt",
+          "modifiedAt"
+        ]
+      },
+      "UserLoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "UserLoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "email"
+            ]
+          }
+        },
+        "required": [
+          "token",
+          "user"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "message": "Bad Request"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "message": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "message": "Forbidden"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "message": "Not Found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "AlertFound": {
+        "description": "Successful retrieval of an alert",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Alert"
+            }
+          }
+        }
+      },
+      "AlertUpdated": {
+        "description": "Successful update of an alert",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Alert"
+            }
+          }
+        }
+      },
+      "AlertCreated": {
+        "description": "Successful creation of an alert",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Alert"
+            }
+          }
+        }
+      },
+      "AlertDeleted": {
+        "description": "Successful deletion of an alert",
+        "content": {
+          "application/json": {}
+        }
+      },
+      "OrderFound": {
+        "description": "Successful retrieval of an order",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OrderResponse"
+            }
+          }
+        }
+      },
+      "OrderUpdated": {
+        "description": "Successful update of an order",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OrderResponse"
+            }
+          }
+        }
+      },
+      "OrderDeleted": {
+        "description": "Successful deletion of an order",
+        "content": {
+          "application/json": {}
+        }
+      },
+      "OrdersByUser": {
+        "description": "Successful retrieval of orders by User ID",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OrdersByUserResponse"
+            }
+          }
+        }
+      },
+      "OrderCreated": {
+        "description": "Successful creation of order",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OrderResponse"
+            }
+          }
+        }
+      },
+      "UserFound": {
+        "description": "Successful retrieval of a user",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        }
+      },
+      "UserCreated": {
+        "description": "Successful creation of a user",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UserLoginResponse"
+            }
+          }
+        }
+      },
+      "UserUpdated": {
+        "description": "Successful update of a user",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        }
+      },
+      "UserLogin": {
+        "description": "Successful user login",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UserLoginResponse"
+            }
+          }
+        }
+      },
+      "UserLogout": {
+        "description": "Successful user logout",
+        "content": {
+          "application/json": {}
+        }
+      },
+      "UserUpdateSuccess": {
+        "description": "User updated successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "message": "User updated successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/products/{id}": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Get a product by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/products/": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Get a list of products",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search term to search for product names and descriptions",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Category filter, e.g. 'tents', 'backpacks'",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "tents",
+                "backpacks",
+                "sleeping-bags",
+                "hammocks"
+              ]
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma separated list of fields to include, e.g. 'name,finalPrice'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset for pagination",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "next": {
+                      "type": "string"
+                    },
+                    "previous": {
+                      "type": "string"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Product"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/alerts/{id}": {
+      "get": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Get an alert by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the alert"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertFound"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Update an alert by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the alert to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertUpdated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Delete an alert by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the alert to delete"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/AlertDeleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/alerts/": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Create a new alert",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/AlertCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get an order by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the order"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrderFound"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Update an order by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the order to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrderUpdated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Delete an order by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the order to delete"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/OrderDeleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/orders/user/{id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get orders for a user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrdersByUser"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/orders/": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create a new order",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Order"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/OrderCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get a user by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserFound"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Update a user by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the user to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserUpdated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Create a new user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/UserCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "User login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserLogin"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "User logout",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserLogout"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  }
+}
