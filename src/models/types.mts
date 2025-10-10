@@ -1,3 +1,11 @@
+// mongoDB find query
+export interface Find {
+  $or?: Array<any>,
+  name?:string,
+  descriptionHtmlSimple?:string,
+  category?:string,
+}
+
 // Product schema
 export interface Product {
   _id: string;
