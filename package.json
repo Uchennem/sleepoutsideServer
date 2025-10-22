@@ -11,7 +11,7 @@
     "start": "node --experimental-strip-types --env-file=.env src/server.ts",
     "build": "npx tsc",
     "dev": "tsx --watch --env-file=.env src/server.ts",
-    "init-db": "tsx --watch --env-file=.env src/database/init-db.js"
+    "init-db": "node --env-file=.env src/database/init-db.js"
   },
   "keywords": [],
   "author": "",

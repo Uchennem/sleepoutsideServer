@@ -126,7 +126,7 @@ export const UserSchema = {
   properties: {
     _id: { type: "string" },
     email: { type: "string", format: "email" },
-    password: {
+    password_hash: {
       type: "string",
       minLength: 6,
       maxLength: 100,
@@ -268,7 +268,7 @@ export const UserSchema = {
     createdAt: { type: "string", format: "date-time" },
     modifiedAt: { type: "string", format: "date-time" }
   },
-  required: ["email", "password", "name", "createdAt", "modifiedAt"]
+  required: ["email", "password_hash", "name", "createdAt", "modifiedAt"]
 };
 
 // Order schema

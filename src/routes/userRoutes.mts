@@ -4,6 +4,8 @@ import { getUserByEmail } from '../models/userModels.mts';
 import * as argon2 from "argon2";
 import jwt from 'jsonwebtoken';
 import mongodb from "../database/index.mts";
+import authorize from '../middleware/authorize.mts';
+import type { User } from '../models/types.mts';
 
 import Ajv from "ajv";
 import addFormats from "ajv-formats"
@@ -56,9 +58,10 @@ router.post('/login', async (req, res) => {
                 name: user.name
             }
         });
-    } catch (error) {
+    } catch (error: any) {
+        console.log('Error: ', error);
         res.status(500).json({
-            message: error || "Failed to login"
+            message: error.message || "Failed to login"
         });
     }
 });
@@ -74,7 +77,6 @@ router.post('/register', async (req, res, next) => {
     try {
         // get the email, name, and password
         const { email, name, password } = req.body || {};
-        console.log(email, name, password);
         
         // validate we have all the fields
         if (isNotFound(email) || isNotFound(name) || isNotFound(password)) {
@@ -93,20 +95,26 @@ router.post('/register', async (req, res, next) => {
         }
 
         // create a new user object
-        const newUser: any = {
+        const newUser: User = {
             email,
-            password: await argon2.hash("password"),
+            password_hash: await argon2.hash("password"),
             name,
+            cart: [],
             createdAt: new Date().toISOString(),
             modifiedAt: new Date().toISOString()
         };
         
         // validate schema
         const validate = ajv.compile(UserSchema);
-        if(!validate(newUser)) throw new EntityNotFoundError({message:validate.errors.join(', '), statusCode:400 });
+        if(!validate(newUser)) {
+            res.status(400).json({
+                message: validate.errors
+            });
+            return;
+        }
 
         // add the user to the database
-        const result = await mongodb.getDb().collection('users').insertOne(newUser);
+        const result = await mongodb.getDb().collection('users').insertOne(newUser as any);
         if (!result.acknowledged) {
             res.status(500).json({
                 message: "Failed to create user"
@@ -136,11 +144,16 @@ router.post('/register', async (req, res, next) => {
             }
         });
 
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
-            message: error || "Failed to register"
+            message: error.message || "Failed to register"
         });
     }
+});
+
+router.get('/protected', authorize, (req, res) => {
+    console.log(res.locals.user);
+    res.json({ message: `Hello, ${res.locals.user.email}!` });
 });
 
 export default router;
