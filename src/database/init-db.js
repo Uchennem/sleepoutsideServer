@@ -30,6 +30,8 @@ const init = async () => {
     await seedAlerts(db);
     await seedOrders(db);
     await seedUsers(db);
+
+    console.log('\n\n  Database initialized!\n');
   } catch (error) {
     console.error(error.message);
   } finally {
@@ -155,12 +157,14 @@ const seedUsers = async (db) => {
     console.log("Collection 'users' created successfully");
 
     // insert test user
+    const now = new Date().toISOString();
     const result = await db.collection("users").insertOne({
       name: "Test User",
       email: "user@example.com",
       password_hash: await argon2.hash("password"),
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+      createdAt: now,
+      updatedAt: now,
+      cart: []
     });
     
     console.log(`1 new listing created in 'users' with the following id:`, result.insertedId);

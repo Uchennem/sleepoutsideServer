@@ -67,15 +67,15 @@ export interface Brand {
 
 // User schema
 export interface User {
-  _id: string;
+  _id?: string;
   email: string;
   password_hash: string;
   name: string;
-  address: Address;
-  phoneNumbers: PhoneNumber[];
+  address?: Address;
+  phoneNumbers?: PhoneNumber[];
   cart: CartItem[];
-  createdAt: Date;
-  modifiedAt: Date;
+  createdAt: string;
+  modifiedAt: string;
 }
 
 export interface Address {
