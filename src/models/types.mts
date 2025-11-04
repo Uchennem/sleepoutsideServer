@@ -74,6 +74,7 @@ export interface User {
   address?: Address;
   phoneNumbers?: PhoneNumber[];
   cart: CartItem[];
+  wishlist?: string[];
   createdAt: string;
   modifiedAt: string;
 }

@@ -164,7 +164,8 @@ const seedUsers = async (db) => {
       password_hash: await argon2.hash("password"),
       createdAt: now,
       updatedAt: now,
-      cart: []
+      cart: [],
+      wishlist: []
     });
     
     console.log(`1 new listing created in 'users' with the following id:`, result.insertedId);

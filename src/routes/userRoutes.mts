@@ -100,6 +100,7 @@ router.post('/register', async (req, res, next) => {
             password_hash: await argon2.hash("password"),
             name,
             cart: [],
+            wishlist: [],
             createdAt: new Date().toISOString(),
             modifiedAt: new Date().toISOString()
         };
@@ -154,6 +155,108 @@ router.post('/register', async (req, res, next) => {
 router.get('/protected', authorize, (req, res) => {
     console.log(res.locals.user);
     res.json({ message: `Hello, ${res.locals.user.email}!` });
+});
+
+// GET /users/:userId/wishlist - Get user's wishlist
+router.get('/:userId/wishlist', authorize, async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Verify the user is accessing their own wishlist
+        if (res.locals.user._id !== userId) {
+            res.status(403).json({ message: 'Forbidden: Cannot access another user\'s wishlist' });
+            return;
+        }
+
+        const user = await mongodb.getDb().collection<User>('users').findOne({ _id: userId } as any);
+
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        res.status(200).json({ wishlist: user.wishlist || [] });
+    } catch (error: any) {
+        console.error('Error fetching wishlist:', error);
+        res.status(500).json({ message: error.message || 'Failed to fetch wishlist' });
+    }
+});
+
+// POST /users/:userId/wishlist - Add item to wishlist
+router.post('/:userId/wishlist', authorize, async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { productId } = req.body;
+
+        // Verify the user is accessing their own wishlist
+        if (res.locals.user._id !== userId) {
+            res.status(403).json({ message: 'Forbidden: Cannot modify another user\'s wishlist' });
+            return;
+        }
+
+        if (!productId) {
+            res.status(400).json({ message: 'Missing productId' });
+            return;
+        }
+
+        // Verify the product exists
+        const product = await mongodb.getDb().collection('products').findOne({ id: productId });
+        if (!product) {
+            res.status(404).json({ message: 'Product not found' });
+            return;
+        }
+
+        // Add the product to the wishlist (using $addToSet to avoid duplicates)
+        const result = await mongodb.getDb().collection('users').updateOne(
+            { _id: userId } as any,
+            {
+                $addToSet: { wishlist: productId },
+                $set: { modifiedAt: new Date().toISOString() }
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Product added to wishlist', productId });
+    } catch (error: any) {
+        console.error('Error adding to wishlist:', error);
+        res.status(500).json({ message: error.message || 'Failed to add product to wishlist' });
+    }
+});
+
+// DELETE /users/:userId/wishlist/:productId - Remove item from wishlist
+router.delete('/:userId/wishlist/:productId', authorize, async (req, res) => {
+    try {
+        const { userId, productId } = req.params;
+
+        // Verify the user is accessing their own wishlist
+        if (res.locals.user._id !== userId) {
+            res.status(403).json({ message: 'Forbidden: Cannot modify another user\'s wishlist' });
+            return;
+        }
+
+        // Remove the product from the wishlist
+        const result = await mongodb.getDb().collection('users').updateOne(
+            { _id: userId } as any,
+            {
+                $pull: { wishlist: productId } as any,
+                $set: { modifiedAt: new Date().toISOString() }
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Product removed from wishlist', productId });
+    } catch (error: any) {
+        console.error('Error removing from wishlist:', error);
+        res.status(500).json({ message: error.message || 'Failed to remove product from wishlist' });
+    }
 });
 
 export default router;
