@@ -265,6 +265,11 @@ export const UserSchema = {
         }
       }
     },
+    wishlist: {
+      type: "array",
+      items: { type: "string" },
+      description: "Array of product IDs in the user's wishlist"
+    },
     createdAt: { type: "string", format: "date-time" },
     modifiedAt: { type: "string", format: "date-time" }
   },
