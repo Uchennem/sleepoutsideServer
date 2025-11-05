@@ -427,7 +427,6 @@ export const OrderSchema = {
   required: [
     "userId",
     "status",
-    "paymentMethod",
     "shippingAddress",
     "orderItems",
     "createdAt",
