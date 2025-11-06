@@ -291,7 +291,7 @@ export const OrderSchema = {
       description:
         "The status of the order, must be one of: pending, processing, shipped or delivered"
     },
-    cardNumber: { type: "string", minLength: 12, maxLength: 12 },
+    cardNumber: { type: "string", minLength: 16, maxLength: 16 },
     cardExpiration: { type: "string" },
     cardCode: { type: "number", minLength: 3, maxLength: 3 },
     shippingAddress: {
@@ -427,7 +427,6 @@ export const OrderSchema = {
   required: [
     "userId",
     "status",
-    "paymentMethod",
     "shippingAddress",
     "orderItems",
     "createdAt",

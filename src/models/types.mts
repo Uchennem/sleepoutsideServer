@@ -162,8 +162,8 @@ export interface Order {
   name: string,
   status: "pending" | "processing" | "shipped" | "delivered";
   cardNumber: string;
-    cardExpiration: string;
-    cardCode: number;
+  cardExpiration: string;
+  cardCode: number;
   shippingAddress: Address;
   orderItems: CartItem[];
   createdAt: Date;
