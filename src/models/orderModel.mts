@@ -11,7 +11,7 @@ export function createOrder() {
 // }))
 
 // calculate functions based off of what the server says
-// Calculate prices using server data 
+
 export async function calculateServerPricedOrder(list: Array<{ productId: string; quantity: number }>): Promise<{
   orderItems: Array<{ productId: string; price: number; quantity: number }>;
   subtotal: number;
