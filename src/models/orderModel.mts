@@ -4,13 +4,15 @@ export function createOrder() {
     
 }
 
-// orderItems: list.map(item => ({
-//     productId: item._id,
-//     price: item.finalPrice,
-//     quantity: item.quantity
-// }))
 
-// calculate functions based off of what the server says
+
+export const calculateShippingCost = function (orderItems: Array<{ productId: string; quantity: number }>) {
+    const itemTotal = orderItems.reduce((total, item) => total + item.quantity, 0);
+    if (itemTotal < 1)
+        return 0;
+    // $10 for first item, $2 for each additional
+    return (itemTotal - 1) * 2 + 10;
+};
 
 export async function calculateServerPricedOrder(list: Array<{ productId: string; quantity: number }>): Promise<{
   orderItems: Array<{ productId: string; price: number; quantity: number }>;
