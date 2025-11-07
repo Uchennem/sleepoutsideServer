@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllProducts, getProductById } from '../models/productModel.mts';
+import { getAllProducts, getProductById, getRecommendedProducts } from '../models/productModel.mts';
 import EntityNotFoundError from '../errors/EntityNotFoundError.mts';
 import type { Request, Response } from 'express';
 import * as utils from '../services/utils.mts';
@@ -23,6 +23,32 @@ router.get('/', async (req, res, next) => {
   res.status(200).json(
     utils.buildPaginationWrapper(products.totalCount, query, products.data)
   );
+});
+
+// GET /products/recommended/:id
+router.get('/recommended/:id', async (req: Request, res: Response, next) => {
+  const { id } = req.params;
+  
+  if (!id) {
+    throw new EntityNotFoundError({
+      message: 'Product ID required',
+      code: 'ERR_VALID',
+      statusCode: 400
+    });
+  }
+
+  // Verify the product exists
+  const product = await getProductById(id);
+  if (!product) {
+    throw new EntityNotFoundError({
+      message: `Product ${id} Not Found`,
+      code: 'ERR_NF',
+      statusCode: 404
+    });
+  }
+
+  const recommended = await getRecommendedProducts(id);
+  res.status(200).json(recommended);
 });
 
 // GET /products/:id
