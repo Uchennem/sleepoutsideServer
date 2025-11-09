@@ -39,3 +39,61 @@ export async function getProductById(id: string): Promise<Product | null> {
     const product = await mongodb.getDb().collection<Product>("products").findOne({id: id});
     return product;
 }
+
+export async function getRecommendedProducts(productId: string): Promise<Product[]> {
+    const product = await getProductById(productId);
+    if (!product) {
+        return [];
+    }
+
+    const collection = mongodb.getDb().collection<Product>("products");
+    const recommended: Product[] = [];
+    const excludedIds = new Set<string>([product.id, product._id]);
+
+    // 1. Get one product from the same category (excluding the original)
+    const sameCategoryProducts = await collection
+        .find({ 
+            category: product.category,
+            id: { $ne: product.id },
+            _id: { $ne: product._id }
+        })
+        .limit(1)
+        .toArray();
+    
+    if (sameCategoryProducts.length > 0) {
+        recommended.push(sameCategoryProducts[0]);
+        excludedIds.add(sameCategoryProducts[0].id);
+        excludedIds.add(sameCategoryProducts[0]._id);
+    }
+
+    // 2. Get one product from a different category (excluding the original and the one we already picked)
+    const differentCategoryProducts = await collection
+        .find({ 
+            category: { $ne: product.category },
+            id: { $nin: Array.from(excludedIds) },
+            _id: { $nin: Array.from(excludedIds) }
+        })
+        .limit(1)
+        .toArray();
+    
+    if (differentCategoryProducts.length > 0) {
+        recommended.push(differentCategoryProducts[0]);
+        excludedIds.add(differentCategoryProducts[0].id);
+        excludedIds.add(differentCategoryProducts[0]._id);
+    }
+
+    // 3. Get one more product (can be any category, but not duplicates)
+    const additionalProducts = await collection
+        .find({ 
+            id: { $nin: Array.from(excludedIds) },
+            _id: { $nin: Array.from(excludedIds) }
+        })
+        .limit(1)
+        .toArray();
+    
+    if (additionalProducts.length > 0) {
+        recommended.push(additionalProducts[0]);
+    }
+
+    return recommended;
+}
