@@ -9,7 +9,8 @@
     "test:ci": "vitest run",
     "start": "node --experimental-strip-types src/server.ts",
     "build": "npx tsc",
-    "dev": "tsx --watch --env-file=.env src/server.ts"
+    "dev": "tsx --watch --env-file=.env src/server.ts",
+    "init-db": "node --env-file=.env src/database/init-db.js"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,8 @@
     "vitest": "^4.0.13"
   },
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.6",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",

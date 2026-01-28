@@ -21,6 +21,17 @@ router.get("/", async (req, res, next) => {
 }
 });
 
-
+// GET /products/:id
+router.get("/:id", async (req, res, next) => {
+  try {
+    const product = await productService.getProductById(req.params.id);
+    if (!product) {
+      return next(new EntityNotFoundError({message: 'Product Not Found', code: 'ERR_NF', statusCode: 404}));
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router; // Export the router to use it in the main file

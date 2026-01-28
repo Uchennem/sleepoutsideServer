@@ -5,6 +5,11 @@ import productModel from "../models/product.model.mts";
   return await productModel.getAllProducts();
 };
 
+const getProductById = async (id: string) => {
+  return await productModel.getProductById(id);
+};
+
 export default {
-  getAllProducts
+  getAllProducts,
+  getProductById
 };
