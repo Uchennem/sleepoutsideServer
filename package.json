@@ -1,0 +1,35 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --typecheck",
+    "test:ci": "vitest run",
+    "start": "node --experimental-strip-types src/server.ts",
+    "build": "npx tsc",
+    "dev": "tsx --watch --env-file=.env src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^22.13.9",
+    "dotenv": "^17.2.3",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.13"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "mongodb": "^7.0.0",
+    "morgan": "^1.10.1"
+  },
+  "packageManager": "pnpm@10.6.1+sha512.40ee09af407fa9fbb5fbfb8e1cb40fbb74c0af0c3e10e9224d7b53c7658528615b2c92450e74cfad91e3a2dcafe3ce4050d80bda71d757756d2ce2b66213e9a3"
+}
