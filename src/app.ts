@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 
 // Local Imports (NOTE: .mts extension is required in ESM)
 import routes from './routes/index.mts';
@@ -39,6 +40,9 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
+
+// Enable CORS for cross-origin requests
+app.use(cors());
 
 // --- 2. ROUTES ---
 // We use versioning (/v1) so we can update the API later without breaking old clients
