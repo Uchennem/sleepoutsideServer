@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/cart.json",
+  "title": "Cart",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_id", "user_id", "items"],
+  "properties": {
+    "_id": { "type": "string" },
+    "user_id": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of product ids"
+    }
+  }
+}

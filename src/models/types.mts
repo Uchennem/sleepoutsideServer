@@ -47,3 +47,60 @@ export interface Brand {
   logoSrc: string;
   name: string;
 }
+
+export interface Reviews {
+  _id: string;
+  product_id: string;
+  content: string[]; // review texts
+}
+
+export interface Cart {
+  _id: string;
+  user_id: string;
+  items: string[]; // product ids
+}
+
+export interface UserName {
+  firstName: string;
+  lastName: string;
+}
+
+export interface UserRole {
+  isCustomer: boolean;
+  isAdmin: boolean;
+}
+
+export interface User {
+  _id: string;
+  name: UserName;
+  email: string;
+  hashedPassword: string;
+  role: UserRole;
+}
+
+export interface OrderStatus {
+  isPaid: boolean;
+  isShipped: boolean;
+}
+
+export interface Order {
+  _id: string;
+  user_id: string;
+  status: OrderStatus;
+  shipping_address: string;
+  items: string[]; // product ids
+  total: number;
+  createdAt: string; // ISO date-time
+}
+
+export type AlertType = "warning" | "info" | "promotion";
+export type AlertStatus = "active" | "inactive";
+
+export interface Alert {
+  _id: string;
+  title: string;
+  type: AlertType;
+  status: AlertStatus;
+  createdAt: string;  // ISO date-time
+  modifiedAt: string; // ISO date-time
+}

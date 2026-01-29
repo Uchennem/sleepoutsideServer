@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/product.min.json",
+  "title": "Product",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_id",
+    "id",
+    "name",
+    "category",
+    "brand",
+    "finalPrice",
+    "isClearance",
+    "isNew",
+    "createdAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "Database identifier"
+    },
+
+    "id": {
+      "type": "string",
+      "description": "Business product code"
+    },
+
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "category": {
+      "type": "string"
+    },
+
+    "brand": {
+      "type": "object",
+      "required": ["id", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+
+    "listPrice": {
+      "type": "number",
+      "minimum": 0
+    },
+
+    "finalPrice": {
+      "type": "number",
+      "minimum": 0
+    },
+
+    "isClearance": {
+      "type": "boolean"
+    },
+
+    "isNew": {
+      "type": "boolean"
+    },
+
+    "reviews": {
+      "type": "object",
+      "required": ["reviewCount", "averageRating"],
+      "additionalProperties": false,
+      "properties": {
+        "reviewCount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "averageRating": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        }
+      }
+    },
+
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
+

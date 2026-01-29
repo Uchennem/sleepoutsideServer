@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/alert.json",
+  "title": "Alert",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_id", "title", "type", "status", "createdAt", "modifiedAt"],
+  "properties": {
+    "_id": { "type": "string" },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The title of the alert, must not be blank"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["warning", "info", "promotion"],
+      "description": "The type of the alert, must be one of: warning, info, promotion"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "description": "The status of the alert, must be one of: active or inactive"
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "modifiedAt": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/order.json",
+  "title": "Order",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_id", "user_id", "status", "shipping_address", "items", "total", "createdAt"],
+  "properties": {
+    "_id": { "type": "string" },
+    "user_id": { "type": "string" },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["isPaid", "isShipped"],
+      "properties": {
+        "isPaid": { "type": "boolean" },
+        "isShipped": { "type": "boolean" }
+      }
+    },
+    "shipping_address": {
+      "type": "string",
+      "minLength": 1
+    },
+    "items": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "List of product ids"
+    },
+    "total": { "type": "number" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}
