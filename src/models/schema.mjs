@@ -169,26 +169,7 @@ export const reviewsSchema = {
   }
 };
 
-// =====================
-// Cart Schema
-// =====================
-export const cartSchema = {
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "https://example.com/schemas/cart.json",
-  title: "Cart",
-  type: "object",
-  additionalProperties: false,
-  required: ["_id", "user_id", "items"],
-  properties: {
-    _id: { type: "string" },
-    user_id: { type: "string" },
-    items: {
-      type: "array",
-      items: { type: "string" },
-      description: "List of product ids"
-    }
-  }
-};
+
 
 // =====================
 // Order Schema
@@ -233,6 +214,9 @@ export const orderSchema = {
 // =====================
 // User Schema
 // =====================
+// =====================
+// User Schema (UPDATED: cart is embedded)
+// =====================
 export const userSchema = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
   $id: "https://example.com/schemas/user.json",
@@ -270,6 +254,25 @@ export const userSchema = {
       properties: {
         isCustomer: { type: "boolean" },
         isAdmin: { type: "boolean" }
+      }
+    },
+
+    // ✅ Embedded cart lives inside the user document
+    cart: {
+      type: "object",
+      additionalProperties: false,
+      required: ["items"],
+      properties: {
+        items: {
+          type: "array",
+          items: { type: "string" },
+          description: "List of product ids"
+        },
+        updatedAt: {
+          type: "string",
+          format: "date-time",
+          description: "When the cart was last modified"
+        }
       }
     }
   }
