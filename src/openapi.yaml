@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Camp Gear API
+  title: Sleep Outside API
   version: 1.0.0
   description: >
     API for products, alerts, orders, reviews, users, and carts.
