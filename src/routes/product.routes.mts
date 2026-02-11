@@ -1,24 +1,24 @@
-import {Router } from "express";
+import { Router } from "express";
 import productService from "../services/product.service.mts";
 import EntityNotFoundError from "../errors/EntityNotFoundError.mts";
+import { sanitize, buildPaginationWrapper } from "../services/utils.mts";
 const router: Router = Router();
 
 // GET /products/
 router.get("/", async (req, res, next) => {
-  // console.log(req.headers, req.body);
   try {
-  const products = await productService.getAllProducts();
-  if (!products?.length) {
-    // This is an example you can refer to about how to handle errors in our routes
-    // If you check the middleware folder you will see a general error handler that will get called automatically when we throw like this
-    return next(new EntityNotFoundError({message : 'Products Not Found',code: 'ERR_NF',
-    statusCode : 404}))
-  }
+    const cleanQuery = sanitize(req.query as Record<string, any>);
+    const result = await productService.getAllProducts(cleanQuery as any);
+    
+    if (result.count === 0) {
+      return next(new EntityNotFoundError({message : 'Products Not Found',code: 'ERR_NF',
+      statusCode : 404}))
+    }
 
-  res.status(200).json(products);
-} catch (error) {
-  next(error);
-}
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // GET /products/:id

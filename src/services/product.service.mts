@@ -1,7 +1,7 @@
 import type { Filter } from "mongodb";
 import productModel from "../models/product.model.mts";
 import type { QueryParams, FindProductObj, Product } from "../models/types.mts";
-import { formatFields } from "./utils.mts";
+import { formatFields, buildPaginationWrapper } from "./utils.mts";
 
 export async function getAllProducts(query: QueryParams) {
   // Build a MongoDB filter that matches your Product type
@@ -31,9 +31,14 @@ export async function getAllProducts(query: QueryParams) {
     findProduct.fieldFilters = formatFields(query.fields);
   }
 
-  // ✅ fixed typo: findProduct (not findProducts)
-  const result = await productModel.getAllProducts(findProduct);
-  return result;
+  // Get the results from model
+  const { totalCount, products } = await productModel.getAllProducts(findProduct);
+  
+  // Build pagination wrapper
+  const paginationWrapper = buildPaginationWrapper(totalCount, query);
+  paginationWrapper.results = products;
+  
+  return paginationWrapper;
 }
 
 export async function getProductById(id: string) {

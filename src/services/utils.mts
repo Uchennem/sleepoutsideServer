@@ -72,4 +72,16 @@ export function buildPaginationWrapper(totalCount: number, query: QueryParams) {
 
 }
 
+export function sanitize(v: Record<string, any>): Record<string, any> {
+  if (typeof v === "object" && v !== null) {
+    for (const key in v) {
+      if (/^\$/.test(key)) {
+        delete v[key];
+      } else if (typeof v[key] === "object") {
+        sanitize(v[key]);
+      }
+    }
+  }
+  return v;
+}
 

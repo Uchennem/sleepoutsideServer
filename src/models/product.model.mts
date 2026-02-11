@@ -1,17 +1,22 @@
 import mongodb from "../database/index.mts";
 import type { Product, FindProductObj } from "./types.mts";
 
-async function getAllProducts(find: FindProductObj): Promise<Product[]> {
-  const cursor = mongodb
-    .getDb()
-    .collection<Product>("products")
-    .find(find.search, {
-      projection: find.fieldFilters,
-    })
+async function getAllProducts(find: FindProductObj) {
+  const collection = mongodb.getDb().collection<Product>("products");
+  const totalCount = await collection.countDocuments(find.search);
+  
+  const cursor = collection
+    .find(find.search)
     .skip(find.offset)
     .limit(find.limit);
 
-  return await cursor.toArray();
+  if (find.fieldFilters) {
+    cursor.project(find.fieldFilters);
+  }
+
+  const products = await cursor.toArray();
+
+  return { totalCount, products };
 }
 
 async function getProductById(id: string): Promise<Product | null> {
