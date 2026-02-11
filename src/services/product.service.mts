@@ -21,7 +21,7 @@ export async function getAllProducts(query: QueryParams) {
   }
 
   const findProduct: FindProductObj = {
-    search,
+    search: search as Record<string, any>,
     limit: query.limit ? parseInt(query.limit, 10) : 20,
     offset: query.offset ? parseInt(query.offset, 10) : 0,
   };
