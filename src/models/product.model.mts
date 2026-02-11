@@ -1,12 +1,13 @@
 import mongodb from "../database/index.mts";
 import type { Product, FindProductObj } from "./types.mts";
+import type { Filter } from "mongodb";
 
 async function getAllProducts(find: FindProductObj) {
   const collection = mongodb.getDb().collection<Product>("products");
-  const totalCount = await collection.countDocuments(find.search);
+  const totalCount = await collection.countDocuments(find.search as Filter<Product>);
   
   const cursor = collection
-    .find(find.search)
+    .find(find.search as Filter<Product>)
     .skip(find.offset)
     .limit(find.limit);
 

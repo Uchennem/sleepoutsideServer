@@ -7,7 +7,7 @@ const router: Router = Router();
 // GET /products/
 router.get("/", async (req, res, next) => {
   try {
-    const cleanQuery = sanitize(req.query as Record<string, any>);
+    const cleanQuery = sanitize({ ...req.query } as Record<string, any>);
     const result = await productService.getAllProducts(cleanQuery as any);
     
     if (result.count === 0) {
