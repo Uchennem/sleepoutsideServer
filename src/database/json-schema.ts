@@ -1,3 +1,11 @@
+import type { JSONSchema7 } from "json-schema";
+
+declare module "json-schema" {
+  export interface JSONSchema7 {
+    instanceof?: string | string[];
+  }
+}
+
 // Product schema
 export const ProductSchema = {
   $schema: "http://json-schema.org/draft-07/schema#",
@@ -118,7 +126,7 @@ export const ProductSchema = {
 };
 
 // User schema
-export const UserSchema = {
+export const UserSchema: JSONSchema7 = {
   $schema: "http://json-schema.org/draft-07/schema#",
   title: "User",
   description: "",
