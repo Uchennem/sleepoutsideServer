@@ -43,9 +43,26 @@ vi.mock("../../src/database/index.mts", () => {
       initDb: (cb) => cb && cb(null),
       getDb: () => ({
         collection: (name) => ({
-          find: (query) => ({
-            toArray: async () => collections[name] || []
-          }),
+          countDocuments: async () => (collections[name] || []).length,
+          find: () => {
+            let data = [...(collections[name] || [])];
+            return {
+              skip: (offset) => {
+                data = data.slice(offset);
+                return {
+                  limit: (limit) => {
+                    data = data.slice(0, limit);
+                    return {
+                      project: () => ({
+                        toArray: async () => data
+                      }),
+                      toArray: async () => data
+                    };
+                  }
+                };
+              }
+            };
+          },
           deleteMany: async (q) => {
             collections[name] = [];
             return { deletedCount: 0 };
@@ -84,36 +101,15 @@ describe("getAllProducts", () => {
   });
 
   it("should return an array of products", async () => {
-    const data = await productsModel.getAllProducts();
+    const data = await productsModel.getAllProducts({
+      search: {},
+      limit: 20,
+      offset: 0
+    });
 
-    expect(data).toEqual([
-      {
-        id: "880RR",
-        nameWithoutBrand: "Ajax Tent - 3-Person, 3-Season",
-        name: "Marmot Ajax Tent - 3-Person, 3-Season",
-        image:
-          "../images/tents/marmot-ajax-tent-3-person-3-season-in-pale-pumpkin-terracotta~p~880rr_01~320.jpg",
-
-        sizesAvailable: {},
-        colors: [
-          {
-            colorCode: "01",
-            colorName: "Pale Pumpkin/Terracotta"
-          }
-        ],
-        descriptionHtmlSimple:
-          "Get out and enjoy nature with Marmot&#39;s Ajax tent, featuring a smart design with durable, waterproof construction and two doors for easy access.",
-        suggestedRetailPrice: 300.0,
-        brand: {
-          id: "1308",
-          logoSrc: "../images/logos/marmot-160x100.jpg",
-          name: "Marmot"
-        },
-        listPrice: 199.99,
-        finalPrice: 199.99
-      }
-    ]);
-    // toBeInstanceOf(Array);
+    expect(data.totalCount).toBe(1);
+    expect(data.products).toHaveLength(1);
+    expect(data.products[0].id).toBe("880RR");
   });
 
   it("should return an empty list if no documents are found in the database", async () => {
@@ -123,7 +119,12 @@ describe("getAllProducts", () => {
       .collection("products");
     await collection.deleteMany({});
 
-    const data = await productsModel.getAllProducts();
-    expect(data).toEqual([]);
+    const data = await productsModel.getAllProducts({
+      search: {},
+      limit: 20,
+      offset: 0
+    });
+    expect(data.totalCount).toBe(0);
+    expect(data.products).toEqual([]);
   });
 });

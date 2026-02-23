@@ -162,13 +162,13 @@ const seedUsers = async (db) => {
     // Requirement: use argon2 to hash before storing
     const hashedPassword = await argon2.hash("password");
 
-    // Requirement fields: name, email, password_hash, createdAt, updatedAt
+    // Requirement fields: name, email, password, createdAt, modifiedAt
     const testUser = {
       name: "Test User",
       email: "testuser@example.com",
-      password_hash: hashedPassword,
+      password: hashedPassword,
       createdAt: now,
-      updatedAt: now,
+      modifiedAt: now,
     };
 
     const result = await usersCollection.insertOne(testUser);
