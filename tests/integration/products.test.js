@@ -1,5 +1,6 @@
 // Load environment variables for tests
 import "dotenv/config";
+import request from "supertest";
 
 // Import test helpers from vitest
 import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
@@ -7,11 +8,32 @@ import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
 // Mock the database module so tests don't require a live MongoDB instance.
 // The mock implements the minimal API used by the model: `initDb`, `getDb`, and `closeDb`.
 vi.mock("../../src/database/index.mts", () => {
+  const matchesQuery = (item, query = {}) => {
+    if (!query || Object.keys(query).length === 0) {
+      return true;
+    }
+
+    if (Array.isArray(query.$or)) {
+      return query.$or.some((subQuery) => matchesQuery(item, subQuery));
+    }
+
+    return Object.entries(query).every(([field, expected]) => {
+      const actual = item[field];
+
+      if (expected instanceof RegExp) {
+        return typeof actual === "string" && expected.test(actual);
+      }
+
+      return actual === expected;
+    });
+  };
+
   // in-memory store for collections
   const collections = {
     products: [
       {
         id: "880RR",
+        category: "tents",
         nameWithoutBrand: "Ajax Tent - 3-Person, 3-Season",
         name: "Marmot Ajax Tent - 3-Person, 3-Season",
         image:
@@ -43,9 +65,13 @@ vi.mock("../../src/database/index.mts", () => {
       initDb: (cb) => cb && cb(null),
       getDb: () => ({
         collection: (name) => ({
-          countDocuments: async () => (collections[name] || []).length,
-          find: () => {
-            let data = [...(collections[name] || [])];
+          countDocuments: async (query = {}) =>
+            (collections[name] || []).filter((item) => matchesQuery(item, query))
+              .length,
+          find: (query = {}) => {
+            let data = [...(collections[name] || [])].filter((item) =>
+              matchesQuery(item, query)
+            );
             return {
               skip: (offset) => {
                 data = data.slice(offset);
@@ -79,12 +105,14 @@ vi.mock("../../src/database/index.mts", () => {
 describe("getAllProducts", () => {
   let mongodb;
   let productsModel;
+  let app;
 
   beforeAll(async () => {
     // Import the mocked DB module and the model after the mock is registered
     mongodb = (await import("../../src/database/index.mts")).default;
     productsModel = (await import("../../src/models/product.model.mts"))
       .default;
+    app = (await import("../../src/app.ts")).default;
 
     // call initDb (mocked)
     await new Promise((resolve, reject) => {
@@ -110,6 +138,35 @@ describe("getAllProducts", () => {
     expect(data.totalCount).toBe(1);
     expect(data.products).toHaveLength(1);
     expect(data.products[0].id).toBe("880RR");
+  });
+
+  it("should return matching products from /products/search by name", async () => {
+    const response = await request(app).get(
+      "/api/v1/products/search?query=ajax"
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.count).toBe(1);
+    expect(response.body.results).toHaveLength(1);
+    expect(response.body.results[0].id).toBe("880RR");
+  });
+
+  it("should return matching products from /products/search by category", async () => {
+    const response = await request(app).get(
+      "/api/v1/products/search?query=tent"
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.count).toBe(1);
+    expect(response.body.results).toHaveLength(1);
+  });
+
+  it("should return 404 when /products/search finds no matches", async () => {
+    const response = await request(app).get(
+      "/api/v1/products/search?query=nomatch"
+    );
+
+    expect(response.status).toBe(404);
   });
 
   it("should return an empty list if no documents are found in the database", async () => {

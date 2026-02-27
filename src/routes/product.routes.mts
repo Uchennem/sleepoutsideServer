@@ -21,6 +21,28 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// GET /products/search
+router.get("/search", async (req, res, next) => {
+  try {
+    const cleanQuery = sanitize({ ...req.query } as Record<string, any>);
+    const result = await productService.searchProducts(cleanQuery as any);
+
+    if (result.count === 0) {
+      return next(
+        new EntityNotFoundError({
+          message: "Products Not Found",
+          code: "ERR_NF",
+          statusCode: 404,
+        })
+      );
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // GET /products/:id
 router.get("/:id", async (req, res, next) => {
   try {
